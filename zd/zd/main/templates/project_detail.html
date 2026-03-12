@@ -1,0 +1,561 @@
+<!-- templates/project_detail.html -->
+{% extends "index.html" %}
+{% load static %}
+
+{% block title %}{{ project.name }}{% endblock %}
+
+{% block content %}
+<style>
+    .project-detail-page {
+        padding: 40px 0;
+        background-color: #f8f9fa;
+        min-height: calc(100vh - 200px);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* Заголовок проекта */
+    .page-header {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .page-header h1 {
+        font-size: 32px;
+        margin: 0;
+        color: #2c3e50;
+        display: inline-block;
+    }
+
+    .project-status {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        margin-left: 15px;
+    }
+
+    .status-draft {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-in_progress {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+
+    .status-completed {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-on_hold {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-cancelled {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .project-actions {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn {
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+    }
+
+    .status-select {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        background-color: white;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    /* Информация о проекте */
+    .project-info {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .info-section {
+        margin-bottom: 30px;
+    }
+
+    .info-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-section h3 {
+        font-size: 20px;
+        color: #2c3e50;
+        margin: 0 0 15px 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .info-section p {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #495057;
+        margin: 0;
+        white-space: pre-wrap;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .info-item {
+        background-color: #f8f9fa;
+        padding: 15px 20px;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-item strong {
+        font-size: 14px;
+        color: #6c757d;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .info-item span {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    /* Требования */
+    .requirements-section {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .requirements-section h2 {
+        font-size: 24px;
+        color: #2c3e50;
+        margin: 0 0 20px 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .requirements-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+    }
+
+    .requirement-item {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1px solid #e9ecef;
+    }
+
+    .requirement-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .requirement-item h4 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 15px 0;
+    }
+
+    .requirement-details {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .requirement-details span {
+        font-size: 14px;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .requirement-details span:before {
+        content: "•";
+        color: #007bff;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge.mandatory {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    /* Участники */
+    .participants-section {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .participants-section h2 {
+        font-size: 24px;
+        color: #2c3e50;
+        margin: 0 0 20px 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .participants-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .participant-card {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e9ecef;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .participant-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    .participant-card h4 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 10px 0;
+    }
+
+    .participant-card p {
+        font-size: 14px;
+        color: #6c757d;
+        margin: 5px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .participant-card p:before {
+        content: "📧";
+        margin-right: 5px;
+        font-size: 14px;
+    }
+
+    .participant-card p:nth-child(3):before {
+        content: "📞";
+    }
+
+    /* Пустые состояния */
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+        font-size: 16px;
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        border: 2px dashed #dee2e6;
+    }
+
+    .empty-state p {
+        margin: 0;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+        }
+
+        .project-actions {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            text-align: center;
+        }
+
+        .requirements-list,
+        .participants-list {
+            grid-template-columns: 1fr;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="project-detail-page">
+    <div class="container">
+        <!-- Заголовок и действия -->
+        <div class="page-header">
+            <div>
+                <h1>{{ project.name }}</h1>
+                <span class="project-status status-{{ project.status }}">
+                    {{ project.get_status_display }}
+                </span>
+            </div>
+            
+            {% if is_creator %}
+            <div class="project-actions">
+                <a href="{% url 'project:project_edit' project.id %}" class="btn btn-primary">Редактировать</a>
+                
+                <form method="post" action="{% url 'project:project_change_status' project.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <select name="status" class="status-select" onchange="this.form.submit()">
+                        {% for status_code, status_name in project.STATUS_CHOICES %}
+                        <option value="{{ status_code }}" {% if project.status == status_code %}selected{% endif %}>
+                            {{ status_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
+
+                <button type="button" class="btn btn-danger" onclick="showDeleteModal()">Удалить</button>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Основная информация -->
+        <div class="project-info">
+            {% if project.description %}
+            <div class="info-section">
+                <h3>Описание</h3>
+                <p>{{ project.description|linebreaks }}</p>
+            </div>
+            {% endif %}
+
+            {% if project.team_activities %}
+            <div class="info-section">
+                <h3>Чем занимается команда</h3>
+                <p>{{ project.team_activities|linebreaks }}</p>
+            </div>
+            {% endif %}
+
+            {% if project.work_conditions %}
+            <div class="info-section">
+                <h3>Условия работы</h3>
+                <p>{{ project.work_conditions|linebreaks }}</p>
+            </div>
+            {% endif %}
+
+            <div class="info-grid">
+                {% if project.start_date %}
+                <div class="info-item">
+                    <strong>Дата начала</strong>
+                    <span>{{ project.start_date|date:"d.m.Y" }}</span>
+                </div>
+                {% endif %}
+                
+                {% if project.end_date %}
+                <div class="info-item">
+                    <strong>Дата окончания</strong>
+                    <span>{{ project.end_date|date:"d.m.Y" }}</span>
+                </div>
+                {% endif %}
+                
+                {% if project.budget %}
+                <div class="info-item">
+                    <strong>Бюджет проекта</strong>
+                    <span>{{ project.budget|floatformat:0 }} ₽</span>
+                </div>
+                {% endif %}
+
+                <div class="info-item">
+                    <strong>Всего бюджет требований</strong>
+                    <span>{{ total_requirements_sum|floatformat:0 }} ₽</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Требования к участникам -->
+        <div class="requirements-section">
+            <h2>Требования к участникам</h2>
+            {% if requirements %}
+            <div class="requirements-list">
+                {% for req in requirements %}
+                <div class="requirement-item">
+                    <h4>{{ req.skill_name|default:"Без навыка" }}</h4>
+                    <div class="requirement-details">
+                        {% if req.level_requirement %}
+                        <span>Уровень: {{ req.get_level_requirement_display }}</span>
+                        {% endif %}
+                        <span>Количество: {{ req.people_count }} чел.</span>
+                        {% if req.price %}
+                        <span>Стоимость: {{ req.price|floatformat:0 }} ₽</span>
+                        {% endif %}
+                        {% if req.work_condition %}
+                        <span>Условия: {{ req.work_condition }}</span>
+                        {% endif %}
+                        {% if req.is_mandatory %}
+                        <span class="badge mandatory">Обязательно</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>Требования не добавлены</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Участники проекта -->
+        <div class="participants-section">
+            <h2>Участники ({{ participants.count }})</h2>
+            {% if participants %}
+            <div class="participants-list">
+                {% for participant in participants %}
+                <div class="participant-card">
+                    <h4>{{ participant.full_name }}</h4>
+                    <p>{{ participant.role }}</p>
+                    <p>{{ participant.email }}</p>
+                    {% if participant.phone %}
+                    <p>{{ participant.phone }}</p>
+                    {% endif %}
+                    {% if is_creator %}
+                    <form method="post" action="{% url 'project:remove_participant' project.id participant.id %}" 
+                          style="margin-top: 15px;" onsubmit="return confirm('Удалить участника из проекта?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 14px;">Удалить</button>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>Нет участников</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно удаления -->
+<div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 30px; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+        <h3 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 20px;">Удаление проекта</h3>
+        <p style="margin: 0 0 20px 0; color: #6c757d; font-size: 16px;">Вы уверены, что хотите удалить проект "{{ project.name }}"?</p>
+        <p style="margin: 0 0 25px 0; color: #dc3545; font-size: 14px; font-weight: 500;">Это действие нельзя отменить!</p>
+        <form method="post" action="{% url 'project:project_delete' project.id %}">
+            {% csrf_token %}
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="hideDeleteModal()" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #dee2e6; background: white; color: #495057; font-size: 14px; cursor: pointer;">Отмена</button>
+                <button type="submit" style="padding: 10px 20px; border-radius: 8px; border: none; background: #dc3545; color: white; font-size: 14px; cursor: pointer;">Удалить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function showDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function hideDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+}
+
+// Закрытие модального окна при клике вне его
+window.onclick = function(event) {
+    const modal = document.getElementById('deleteModal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}

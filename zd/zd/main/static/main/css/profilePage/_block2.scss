@@ -1,0 +1,111 @@
+/* 2nd */
+.profile-block.block-2 {
+    h2 {
+        font-size: 53px;
+        color: var(--dark-col);
+        margin-bottom: 25px;
+    }
+}
+
+.filter-controls {
+    color: var(--dark-col);
+    input {
+        color: var(--dark-gray-col);
+    }
+    margin-top: 60px;
+    display: grid;
+    justify-items: start;
+    gap: 12px;
+}
+
+.profile-second {
+    &-request {
+        &-list {
+            overflow-y: scroll;
+            max-height: 50vh;
+            margin-top: 30px;
+            display: grid;
+            padding: 4vw;
+            gap: 3vw;
+            border-radius: 30px;
+            border: 3px solid var(--dark-gray-col);
+            background-color: var(--light-gray-col);
+        }
+        
+        &-el {
+            color: var(--dark-col);
+            h3 {
+                font-size: clamp(14px, 13.5vw, 26px);
+                margin-bottom: 0.5vw;
+            }
+            p {
+                font-size: clamp(10px, 3vw, 20px);
+            }
+            padding: 15px;
+            border-radius: 20px;
+            border: 3px solid var(--dark-gray-col);
+            background-color: var(--light-col);
+        }
+    }
+    &-select {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 10px 20px 20px;
+        border-radius: 20px;
+        border: 3px solid  var(--dark-gray-col);
+        width: 300px;
+        max-width: 300px;
+        p {
+            font-size: 17px;
+            color: var(--dark-gray-col);
+        }
+        &-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;    
+            margin-bottom: 17px;
+        }
+    }
+    &-btn-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    &-not-found {
+        display: grid;
+        text-align: center;
+        margin-top: clamp(30px, 12vw, 80px);
+        
+        p {
+            font-size: 20px;
+            color: var(--dark-gray-col);
+            margin-bottom: 25px;
+        }
+    }
+}
+
+.profile-row-el {
+    font-size: 17px;
+    color: var(--dark-col);
+    padding: 10px 20px;
+    border: 1px solid  var(--dark-gray-col);
+    border-radius: 20px;
+}
+
+.reset-filters {
+    font-size: 20px;
+    color: var(--light-col);
+    padding: 16px 47px;
+    border-radius: 20px;
+    background: linear-gradient(to right, var(--light-red-col), var(--dark-red-col));
+}
+
+.not-found-block {
+    h2 {
+        font-size: 28px !important;
+    }
+    img {
+        margin-bottom: 25px;
+    }
+}

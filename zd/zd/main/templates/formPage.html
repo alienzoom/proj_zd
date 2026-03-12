@@ -1,0 +1,1234 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'main/css/formPage.css' %}">
+<style>
+    /* Улучшенные стили для отступов */
+    .personal-section,
+    .role-section,
+    .organization-section,
+    .budget-section,
+    .technologies-section {
+        background: #2d2d2d;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 25px 0;
+        border: 2px solid #404040;
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #404040;
+    }
+    
+    .section-header h3 {
+        color: #e0e0e0;
+        font-size: 20px;
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .name-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .age-field,
+    .activity-field,
+    .key-skills-field,
+    .about-field,
+    .additional-info-field {
+        margin-bottom: 25px;
+    }
+    
+    .age-field label,
+    .activity-field label,
+    .key-skills-field label,
+    .about-field label,
+    .additional-info-field label {
+        display: block;
+        color: #b0b0b0;
+        font-size: 15px;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+    
+    .form-input,
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #404040;
+        border-radius: 12px;
+        font-size: 15px;
+        background: #363636;
+        color: #e0e0e0;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+    
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+        border-color: #667eea;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        background: #3d3d3d;
+    }
+    
+    .form-textarea {
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+    }
+    
+    /* Стили для ключевых навыков (тегов) */
+    .key-skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 15px 0 10px;
+        padding: 15px;
+        background: #2d2d2d;
+        border-radius: 12px;
+        border: 2px solid #404040;
+        min-height: 60px;
+    }
+    
+    .key-skills-container .skill-item {
+        margin: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 25px;
+        padding: 8px 16px 8px 20px;
+        font-size: 14px;
+        transition: transform 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .key-skills-container .skill-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    .key-skills-container .skill-item .skill-name {
+        color: white;
+        font-weight: 500;
+    }
+    
+    .key-skills-container .skill-item .skill-remove {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 0 5px;
+        margin-left: 8px;
+        opacity: 0.8;
+        transition: all 0.3s ease;
+        line-height: 1;
+    }
+    
+    .key-skills-container .skill-item .skill-remove:hover {
+        opacity: 1;
+        transform: scale(1.2);
+        color: #ff4757;
+    }
+    
+    .key-skills-hint {
+        display: block;
+        color: #888;
+        font-size: 13px;
+        margin: 5px 0 10px;
+        font-style: italic;
+    }
+    
+    .add-key-skill-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 24px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin: 10px 0 5px;
+    }
+    
+    .add-key-skill-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* Стили для технологий */
+    .technologies-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    
+    .technologies-header h3 {
+        color: #e0e0e0;
+        font-size: 20px;
+        margin: 0;
+    }
+    
+    .add-skill-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .add-skill-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .skills-container {
+        margin-top: 20px;
+    }
+    
+    .skill-group {
+        margin-bottom: 30px;
+    }
+    
+    .skill-group:last-child {
+        margin-bottom: 0;
+    }
+    
+    .skill-group-header {
+        margin-bottom: 15px;
+    }
+    
+    .skill-group-title {
+        color: #b0b0b0;
+        font-size: 16px;
+        font-weight: 600;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #404040;
+        margin: 0;
+    }
+    
+    .skill-group-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .skill-item {
+        display: inline-flex;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 30px;
+        padding: 8px 16px 8px 20px;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .skill-item-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .skill-name {
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .skill-level-badge {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 4px 10px;
+        font-size: 12px;
+        color: white;
+        font-weight: 500;
+    }
+    
+    .skill-remove {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0 5px;
+        margin-left: 8px;
+        opacity: 0.8;
+        transition: all 0.3s ease;
+        line-height: 1;
+    }
+    
+    .skill-remove:hover {
+        opacity: 1;
+        transform: scale(1.2);
+        color: #ff4757;
+    }
+    
+    .empty-skills {
+        text-align: center;
+        padding: 30px 20px;
+        background: #2d2d2d;
+        border-radius: 12px;
+        border: 2px dashed #404040;
+    }
+    
+    .empty-skills p {
+        color: #888;
+        font-size: 14px;
+        margin: 0;
+    }
+    
+    /* Стили для требований исполнителя */
+    .budget-section h4 {
+        color: #b0b0b0;
+        font-size: 16px;
+        font-weight: 500;
+        margin: 25px 0 20px 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #404040;
+    }
+    
+    .requirements-list {
+        background: #2d2d2d;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 2px solid #404040;
+    }
+    
+    .requirements-el {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #404040;
+    }
+    
+    .requirements-el:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .requirements-el label {
+        display: block;
+        font-size: 14px;
+        color: #b0b0b0;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    
+    .requirements-el input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #404040;
+        border-radius: 10px;
+        background: #363636;
+        color: #e0e0e0;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .requirements-el input:focus {
+        border-color: #667eea;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+    
+    .add-requirement-btn {
+        width: 100%;
+        padding: 14px;
+        background: #2d2d2d;
+        border: 2px dashed #667eea;
+        border-radius: 12px;
+        color: #667eea;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        margin: 20px 0 10px;
+    }
+    
+    .add-requirement-btn:hover {
+        background: #667eea;
+        color: white;
+        border-style: solid;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .add-requirement-btn::before {
+        content: "+";
+        font-size: 22px;
+        font-weight: 600;
+    }
+    
+    .form-button {
+        width: 100%;
+        padding: 16px 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        margin-top: 30px;
+    }
+    
+    .form-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    /* Стили для дополнительных сведений */
+    .additional-info-field .field-hint {
+        display: block;
+        color: #888;
+        font-size: 13px;
+        margin-top: 8px;
+        font-style: italic;
+        line-height: 1.6;
+        padding-left: 5px;
+    }
+    
+    /* Стили для блока авторизации */
+    .auth-info {
+        background: #2d2d2d;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 25px 0;
+        border: 2px solid #404040;
+    }
+    
+    .auth-info-content {
+        color: #e0e0e0;
+    }
+    
+    .auth-info-content p {
+        margin: 10px 0;
+        font-size: 16px;
+    }
+    
+    .auth-info-content strong {
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .auth-info-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #404040;
+    }
+    
+    .auth-info-header p {
+        color: #e0e0e0;
+        font-size: 20px;
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .auth-info-header .badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .name-fields {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .requirements-el {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .personal-section,
+        .role-section,
+        .organization-section,
+        .budget-section,
+        .technologies-section {
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .technologies-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .add-skill-btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Модальное окно для добавления технологии -->
+<div class="skill-modal-overlay" id="skillModalOverlay" style="display: none;">
+    <div class="skill-modal">
+        <div class="skill-modal-header">
+            <h3>Добавить технологию</h3>
+            <button type="button" class="skill-modal-close" id="closeSkillModal">×</button>
+        </div>
+        <div class="skill-modal-content">
+            <div class="skill-modal-field">
+                <label for="skillName">Название технологии *</label>
+                <input type="text" id="skillName" class="skill-input" placeholder="Например: JavaScript, Python, React...">
+            </div>
+            <div class="skill-modal-field">
+                <label for="skillLevel">Уровень владения</label>
+                <select id="skillLevel" class="skill-select">
+                    <option value="beginner">Начинающий</option>
+                    <option value="intermediate">Продвинутый</option>
+                    <option value="expert">Эксперт</option>
+                </select>
+            </div>
+        </div>
+        <div class="skill-modal-footer">
+            <button type="button" class="skill-modal-btn cancel" id="cancelSkillModal">Отмена</button>
+            <button type="button" class="skill-modal-btn add" id="addSkillBtn">Добавить</button>
+        </div>
+    </div>
+</div>
+
+<div class="formPage">
+    <div class="formPage-block request-form">
+        
+        <div class="formPage-header">
+            <p href="#!" class="link" style="color: white;">Заявка</p>
+        </div>
+
+        <form class="formPage-form" method="post" action="{% url 'form_page' %}" id="application-form">
+            {% csrf_token %}
+            <input type="hidden" name="application_submit" value="1">
+            
+            <div class="form-request">
+                <!-- О себе -->
+                <div class="personal-section">
+                    <div class="section-header">
+                        <h3>О себе</h3>
+                    </div>
+                    
+                    <!-- Контактные данные -->
+                    <div class="name-fields">
+                        {{ application_form.contact_last_name }}
+                        {{ application_form.contact_first_name }}
+                        {{ application_form.contact_middle_name }}
+                    </div>
+                    
+                    {% if application_form.contact_last_name.errors %}
+                        <div class="error">{{ application_form.contact_last_name.errors }}</div>
+                    {% endif %}
+                    
+                    {{ application_form.contact_phone }}
+                    {% if application_form.contact_phone.errors %}
+                        <div class="error">{{ application_form.contact_phone.errors }}</div>
+                    {% endif %}
+                    
+                    {{ application_form.contact_email }}
+                    {% if application_form.contact_email.errors %}
+                        <div class="error">{{ application_form.contact_email.errors }}</div>
+                    {% endif %}
+                    
+                    <!-- Возраст -->
+                    <div class="age-field">
+                        <label for="{{ application_form.age.id_for_label }}">Возраст</label>
+                        {{ application_form.age }}
+                        {% if application_form.age.errors %}
+                            <div class="error">{{ application_form.age.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Область деятельности -->
+                    <div class="activity-field">
+                        <label>Область деятельности *</label>
+                        <select name="activity_area" id="activityArea" class="form-select" required>
+                            <option value="">Выберите область деятельности</option>
+                            <option value="it">Информационные технологии</option>
+                            <option value="energy">Энергетика</option>
+                            <option value="communications">Связь</option>
+                            <option value="automation">Автоматика</option>
+                            <option value="mathematics">Математика</option>
+                            <option value="economics">Экономика</option>
+                            <option value="management">Менеджмент</option>
+                            <option value="business_analysis">Бизнес-анализ</option>
+                            <option value="construction">Строительство</option>
+                            <option value="other">Другое</option>
+                        </select>
+                        <div id="otherActivityField" style="display: none; margin-top: 15px;">
+                            <input type="text" 
+                                name="other_activity" 
+                                id="otherActivity" 
+                                class="form-input" 
+                                placeholder="Укажите вашу область деятельности">
+                        </div>
+                    </div>
+                    
+                    <!-- Ключевые навыки (ввод через запятую) -->
+                    <div class="key-skills-field">
+                        <label for="keySkillsInput">Ключевые навыки</label>
+                        <input type="text" 
+                            id="keySkillsInput" 
+                            class="form-input" 
+                            placeholder="Введите навыки через запятую (например: управление проектами, Python, анализ данных)">
+                        <button type="button" class="add-key-skill-btn" id="addKeySkillBtn">+ Добавить навыки</button>
+                        <span class="key-skills-hint">Введите навыки через запятую и нажмите кнопку "Добавить"</span>
+                        
+                        <!-- Контейнер для добавленных ключевых навыков -->
+                        <div class="key-skills-container" id="keySkillsContainer">
+                            <!-- Добавленные навыки будут отображаться здесь -->
+                        </div>
+                        
+                        <!-- Скрытое поле для хранения данных ключевых навыков -->
+                        <input type="hidden" name="key_skills_data" id="keySkillsData" value="[]">
+                    </div>
+                    
+                    <!-- Шаблон для ключевого навыка -->
+                    <template id="keySkillItemTemplate">
+                        <div class="skill-item" data-skill-name="">
+                            <span class="skill-name"></span>
+                            <button type="button" class="skill-remove" title="Удалить">×</button>
+                        </div>
+                    </template>
+                    
+                    <!-- Знание технологий -->
+                    <div class="technologies-section">
+                        <div class="technologies-header">
+                            <h3>Знание технологий</h3>
+                            <button type="button" class="add-skill-btn" id="showSkillModalBtn">
+                                + Добавить технологию
+                            </button>
+                        </div>
+                        
+                        <!-- Контейнер для технологий -->
+                        <div class="skills-container" id="skillsContainer">
+                            <!-- Технологии будут добавляться сюда динамически -->
+                        </div>
+                        
+                        <!-- Скрытое поле для хранения данных технологий -->
+                        <input type="hidden" name="skills_data" id="skillsDataInput" value="[]">
+                    </div>
+                    
+                    <!-- Дополнительные сведения -->
+                    <div class="additional-info-field">
+                        <label for="additional_info">Дополнительные сведения</label>
+                        <textarea 
+                            id="additional_info" 
+                            name="additional_info" 
+                            class="form-textarea" 
+                            placeholder="• ссылка на leader.id&#10;• ссылка на elibrary&#10;• ссылка на github&#10;• примеры проектов&#10;• опыт работы&#10;• языки&#10;• права"
+                            rows="8"
+                        ></textarea>
+                        <span class="field-hint">
+                            Укажите ссылки на профили, примеры работ, опыт, языки и другую важную информацию
+                        </span>
+                    </div>
+                    
+                    <!-- Расскажите о себе -->
+                    <div class="about-field">
+                        <label for="{{ application_form.about_me.id_for_label }}">Расскажите о себе</label>
+                        {{ application_form.about_me }}
+                        {% if application_form.about_me.errors %}
+                            <div class="error">{{ application_form.about_me.errors }}</div>
+                        {% endif %}
+                        <span class="field-hint">Опыт работы, образование, цели, интересы, достижения</span>
+                    </div>
+                </div>
+
+                <!-- Роль в команде -->
+                <div class="role-section">
+                    <div class="section-header">
+                        <h3>Роль в команде</h3>
+                        <span class="optional-badge">необязательно</span>
+                    </div>
+                    
+                    <div class="role-select-wrapper">
+                        <select name="team_role" id="teamRole" class="role-select">
+                            <option value="">Выберите роль в команде</option>
+                            <option value="visionary">Генератор идей - создаю новые концепции и нестандартные решения</option>
+                            <option value="implementer">Исполнитель - воплощаю идеи в жизнь, довожу задачи до результата</option>
+                            <option value="leader">Лидер - координирую работу, принимаю решения, веду команду к цели</option>
+                            <option value="organizer">Организатор - структурирую процессы, распределяю ресурсы, слежу за сроками</option>
+                            <option value="analyst">Аналитик - оцениваю риски, ищу оптимальные пути, работаю с данными</option>
+                            <option value="communicator">Коммуникатор - выстраиваю связи, разрешаю конфликты, поддерживаю атмосферу</option>
+                            <option value="perfectionist">Контролер качества - проверяю детали, ищу ошибки, стремлюсь к идеалу</option>
+                            <option value="resource_investigator">Исследователь ресурсов - ищу возможности, контакты, новые инструменты</option>
+                        </select>
+                        {% if application_form.team_role.errors %}
+                            <div class="error">{{ application_form.team_role.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="other-role-field" id="otherRoleField" style="display: none;">
+                        <input type="text" 
+                            id="otherRole" 
+                            name="other_role" 
+                            class="form-input" 
+                            placeholder="Укажите вашу роль">
+                    </div>
+                </div>
+
+                <!-- Организация -->
+                <div class="organization-section">
+                    <div class="section-header">
+                        <h3>Организация</h3>
+                    </div>
+                    
+                    {{ application_form.organization_name }}
+                    {% if application_form.organization_name.errors %}
+                        <div class="error">{{ application_form.organization_name.errors }}</div>
+                    {% endif %}
+                    
+                    {{ application_form.organization_inn }}
+                    {% if application_form.organization_inn.errors %}
+                        <div class="error">{{ application_form.organization_inn.errors }}</div>
+                    {% endif %}
+                    
+                    {{ application_form.organization_website }}
+                    {% if application_form.organization_website.errors %}
+                        <div class="error">{{ application_form.organization_website.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Требования исполнителя -->
+                <div class="budget-section">
+                    <div class="section-header">
+                        <h3>Требования исполнителя</h3>
+                    </div>
+                    
+                    <!-- Ожидаемое вознаграждение -->
+                    <div class="requirement-field">
+                        <label for="expected_reward">Ожидаемое вознаграждение</label>
+                        <input type="text" 
+                            id="expected_reward" 
+                            name="expected_reward" 
+                            class="form-input" 
+                            placeholder="например: 100 000 ₽/мес или 5 000 ₽/час">
+                    </div>
+                    
+                    <!-- График работы -->
+                    <div class="requirement-field">
+                        <label for="work_schedule">График работы</label>
+                        <input type="text" 
+                            id="work_schedule" 
+                            name="work_schedule" 
+                            class="form-input" 
+                            placeholder="например: полный день, гибкий график, удаленно">
+                    </div>
+                    
+                    <!-- Требуемое оборудование -->
+                    <div class="requirement-field">
+                        <label for="required_equipment">Требуемое оборудование</label>
+                        <input type="text" 
+                            id="required_equipment" 
+                            name="required_equipment" 
+                            class="form-input" 
+                            placeholder="например: ноутбук, монитор, софт">
+                    </div>
+                    
+                    <h4>Дополнительные требования:</h4>
+                    
+                    <div class="requirements-list" id="requirementsList">
+                        <!-- Шаблон для дополнительных требований -->
+                        <div class="requirements-el template" style="display: none;">
+                            <label>
+                                Требование:
+                                <input type="text" name="requirement_name[]" class="requirement-name" placeholder="например: софт, оборудование, условия">
+                            </label>
+                            <label>
+                                Стоимость (₽):
+                                <input type="text" name="requirement_price[]" class="requirement-price" placeholder="сумма">
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="button" class="add-requirement-btn" id="addRequirementBtn">
+                        + Добавить требование
+                    </button>
+                </div>
+                
+                <!-- Общие ошибки формы -->
+                {% if application_form.non_field_errors %}
+                    <div class="error">
+                        {% for error in application_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <button class="form-button" type="submit" id="application-submit">
+                    Подать заявку
+                </button>
+            </div>
+        </form>
+    </div>          
+    
+    <!-- Блок авторизации - показываем только для неавторизованных пользователей -->
+    {% if not user.is_authenticated %}
+    <div class="formPage-block reg-form">
+        <!-- ВХОД-РЕГИСТРАЦИЯ -->
+        <div class="formPage-header">
+            <p href="#!" class="sign-in active link" style="color: black;">Вход</p>
+            <p href="#!" class="sign-up link">Регистрация</p>
+        </div>
+        
+        <!-- ФОРМА ВХОДА -->
+        <form class="formPage-form" method="post" action="{% url 'form_page' %}" id="login-form">
+            {% csrf_token %}
+            <input type="hidden" name="login_submit" value="1">
+            <div class="form-sign-in">
+                {{ login_form.username }}
+                {% if login_form.username.errors %}
+                    <div class="error">{{ login_form.username.errors }}</div>
+                {% endif %}
+                
+                {{ login_form.password }}
+                {% if login_form.password.errors %}
+                    <div class="error">{{ login_form.password.errors }}</div>
+                {% endif %}
+                
+                {% if login_form.non_field_errors %}
+                    <div class="error">
+                        {% for error in login_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <input class="form-button" type="submit" value="войти" id="login-submit">
+            </div>
+        </form>
+
+        <!-- ФОРМА РЕГИСТРАЦИИ -->
+        <form class="formPage-form" method="post" action="{% url 'form_page' %}" id="registration-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="registration_submit" value="1">
+            <div class="form-sign-up" style="display: grid;">
+                {{ registration_form.last_name }}
+                {% if registration_form.last_name.errors %}
+                    <div class="error">{{ registration_form.last_name.errors }}</div>
+                {% endif %}
+                
+                {{ registration_form.first_name }}
+                {% if registration_form.first_name.errors %}
+                    <div class="error">{{ registration_form.first_name.errors }}</div>
+                {% endif %}
+                
+                {{ registration_form.middle_name }}
+                {% if registration_form.middle_name.errors %}
+                    <div class="error">{{ registration_form.middle_name.errors }}</div>
+                {% endif %}
+
+                {{ registration_form.email }}
+                {% if registration_form.email.errors %}
+                    <div class="error">{{ registration_form.email.errors }}</div>
+                {% endif %}
+                
+                {{ registration_form.phone_number }}
+                {% if registration_form.phone_number.errors %}
+                    <div class="error">{{ registration_form.phone_number.errors }}</div>
+                {% endif %}
+                
+                {{ registration_form.password1 }}
+                {% if registration_form.password1.errors %}
+                    <div class="error">{{ registration_form.password1.errors }}</div>
+                {% endif %}
+                <p>Минимум 8 символов</p>
+                
+                {{ registration_form.password2 }}
+                {% if registration_form.password2.errors %}
+                    <div class="error">{{ registration_form.password2.errors }}</div>
+                {% endif %}
+                
+                {% if registration_form.non_field_errors %}
+                    <div class="error">
+                        {% for error in registration_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <input class="form-button" type="submit" value="Зарегистрироваться" id="registration-submit">
+            </div>
+        </form>
+    </div>
+    {% else %}
+
+    {% endif %}
+</div>
+
+<!-- Шаблоны для технологий -->
+<template id="skillItemTemplate">
+    <div class="skill-item" data-skill-name="" data-skill-level="">
+        <div class="skill-item-content">
+            <span class="skill-name"></span>
+            <span class="skill-level-badge"></span>
+        </div>
+        <button type="button" class="skill-remove" title="Удалить">×</button>
+    </div>
+</template>
+
+<template id="skillGroupTemplate">
+    <div class="skill-group">
+        <div class="skill-group-header">
+            <h4 class="skill-group-title"></h4>
+        </div>
+        <div class="skill-group-items"></div>
+    </div>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ========== ТЕХНОЛОГИИ ==========
+    const modalOverlay = document.getElementById('skillModalOverlay');
+    const showModalBtn = document.getElementById('showSkillModalBtn');
+    const closeModalBtn = document.getElementById('closeSkillModal');
+    const cancelModalBtn = document.getElementById('cancelSkillModal');
+    const addSkillBtn = document.getElementById('addSkillBtn');
+    const skillsContainer = document.getElementById('skillsContainer');
+    const skillsDataInput = document.getElementById('skillsDataInput');
+    
+    const skillNameInput = document.getElementById('skillName');
+    const skillLevelSelect = document.getElementById('skillLevel');
+    
+    const skillTemplate = document.getElementById('skillItemTemplate');
+    const groupTemplate = document.getElementById('skillGroupTemplate');
+    
+    const levelNames = {
+        'beginner': 'Начинающий',
+        'intermediate': 'Продвинутый',
+        'expert': 'Эксперт'
+    };
+    
+    const levelOrder = ['beginner', 'intermediate', 'expert'];
+    
+    let skills = [];
+    
+    try {
+        const savedSkills = skillsDataInput.value;
+        if (savedSkills && savedSkills !== '[]') {
+            skills = JSON.parse(savedSkills);
+        }
+    } catch (e) {
+        console.error('Ошибка парсинга технологий:', e);
+    }
+    
+    function renderSkills() {
+        if (!skillsContainer) return;
+        
+        const groupedSkills = {};
+        levelOrder.forEach(level => {
+            groupedSkills[level] = [];
+        });
+        
+        skills.forEach(skill => {
+            const level = skill.level || 'beginner';
+            if (groupedSkills[level]) {
+                groupedSkills[level].push(skill);
+            } else {
+                groupedSkills['beginner'].push(skill);
+            }
+        });
+        
+        skillsContainer.innerHTML = '';
+        
+        let hasSkills = false;
+        
+        levelOrder.forEach(level => {
+            const levelSkills = groupedSkills[level] || [];
+            if (levelSkills.length === 0) return;
+            
+            hasSkills = true;
+            
+            const groupClone = groupTemplate.content.cloneNode(true);
+            const groupElement = groupClone.querySelector('.skill-group');
+            const groupTitle = groupClone.querySelector('.skill-group-title');
+            const groupItems = groupClone.querySelector('.skill-group-items');
+            
+            groupTitle.textContent = levelNames[level] || 'Начинающий';
+            
+            levelSkills.forEach(skill => {
+                const skillClone = skillTemplate.content.cloneNode(true);
+                const skillElement = skillClone.querySelector('.skill-item');
+                const skillName = skillClone.querySelector('.skill-name');
+                const skillLevel = skillClone.querySelector('.skill-level-badge');
+                const removeBtn = skillClone.querySelector('.skill-remove');
+                
+                skillName.textContent = skill.name;
+                skillLevel.textContent = levelNames[skill.level] || '';
+                skillElement.dataset.skillName = skill.name;
+                skillElement.dataset.skillLevel = skill.level || 'beginner';
+                
+                removeBtn.addEventListener('click', function() {
+                    removeSkill(skill.name);
+                });
+                
+                groupItems.appendChild(skillElement);
+            });
+            
+            skillsContainer.appendChild(groupElement);
+        });
+        
+        if (!hasSkills) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-skills';
+            emptyMessage.innerHTML = '<p>Технологии не добавлены. Нажмите "+ Добавить технологию"</p>';
+            skillsContainer.appendChild(emptyMessage);
+        }
+        
+        skillsDataInput.value = JSON.stringify(skills);
+    }
+    
+    function addSkill() {
+        const name = skillNameInput.value.trim();
+        if (!name) {
+            alert('Введите название технологии');
+            return;
+        }
+        
+        if (skills.some(s => s.name.toLowerCase() === name.toLowerCase())) {
+            alert('Такая технология уже добавлена');
+            return;
+        }
+        
+        const level = skillLevelSelect.value;
+        
+        skills.push({
+            name: name,
+            level: level
+        });
+        
+        skillNameInput.value = '';
+        skillLevelSelect.value = 'beginner';
+        
+        closeModal();
+        renderSkills();
+    }
+    
+    function removeSkill(skillName) {
+        skills = skills.filter(s => s.name !== skillName);
+        renderSkills();
+    }
+    
+    function openModal() {
+        modalOverlay.style.display = 'flex';
+        skillNameInput.focus();
+    }
+    
+    function closeModal() {
+        modalOverlay.style.display = 'none';
+        skillNameInput.value = '';
+        skillLevelSelect.value = 'beginner';
+    }
+    
+    if (showModalBtn) {
+        showModalBtn.addEventListener('click', openModal);
+    }
+    
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeModal);
+    }
+    
+    if (cancelModalBtn) {
+        cancelModalBtn.addEventListener('click', closeModal);
+    }
+    
+    if (addSkillBtn) {
+        addSkillBtn.addEventListener('click', addSkill);
+    }
+    
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+    }
+    
+    if (skillNameInput) {
+        skillNameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addSkill();
+            }
+        });
+    }
+    
+    renderSkills();
+    
+    // ========== ОБЛАСТЬ ДЕЯТЕЛЬНОСТИ ==========
+    const activitySelect = document.getElementById('activityArea');
+    const otherActivityField = document.getElementById('otherActivityField');
+    const otherActivityInput = document.getElementById('otherActivity');
+    
+    if (activitySelect) {
+        activitySelect.addEventListener('change', function() {
+            if (this.value === 'other') {
+                otherActivityField.style.display = 'block';
+                otherActivityInput.setAttribute('required', 'required');
+            } else {
+                otherActivityField.style.display = 'none';
+                otherActivityInput.removeAttribute('required');
+                otherActivityInput.value = '';
+            }
+        });
+    }
+    
+    // ========== КЛЮЧЕВЫЕ НАВЫКИ (ввод через запятую) ==========
+    const keySkillsInput = document.getElementById('keySkillsInput');
+    const addKeySkillBtn = document.getElementById('addKeySkillBtn');
+    const keySkillsContainer = document.getElementById('keySkillsContainer');
+    const keySkillsData = document.getElementById('keySkillsData');
+    const keySkillTemplate = document.getElementById('keySkillItemTemplate');
+    
+    let keySkills = [];
+    
+    try {
+        const savedKeySkills = keySkillsData.value;
+        if (savedKeySkills && savedKeySkills !== '[]') {
+            keySkills = JSON.parse(savedKeySkills);
+            renderKeySkills();
+        }
+    } catch (e) {
+        console.error('Ошибка парсинга ключевых навыков:', e);
+    }
+    
+    function renderKeySkills() {
+        if (!keySkillsContainer) return;
+        
+        keySkillsContainer.innerHTML = '';
+        
+        if (keySkills.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-skills';
+            emptyMessage.innerHTML = '<p>Навыки не добавлены. Введите навыки через запятую и нажмите "Добавить"</p>';
+            keySkillsContainer.appendChild(emptyMessage);
+        } else {
+            keySkills.forEach(skill => {
+                const skillClone = keySkillTemplate.content.cloneNode(true);
+                const skillElement = skillClone.querySelector('.skill-item');
+                const skillName = skillClone.querySelector('.skill-name');
+                const removeBtn = skillClone.querySelector('.skill-remove');
+                
+                skillName.textContent = skill.trim();
+                skillElement.dataset.skillName = skill.trim();
+                
+                removeBtn.addEventListener('click', function() {
+                    removeKeySkill(skill.trim());
+                });
+                
+                keySkillsContainer.appendChild(skillElement);
+            });
+        }
+        
+        keySkillsData.value = JSON.stringify(keySkills);
+    }
+    
+    function addKeySkills() {
+        const inputText = keySkillsInput.value.trim();
+        if (!inputText) {
+            alert('Введите навыки');
+            return;
+        }
+        
+        // Разделяем по запятой и очищаем от лишних пробелов
+        const newSkills = inputText.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        
+        if (newSkills.length === 0) {
+            alert('Введите хотя бы один навык');
+            return;
+        }
+        
+        // Добавляем новые навыки, избегая дубликатов
+        newSkills.forEach(skill => {
+            if (!keySkills.includes(skill)) {
+                keySkills.push(skill);
+            }
+        });
+        
+        // Очищаем поле ввода
+        keySkillsInput.value = '';
+        
+        renderKeySkills();
+    }
+    
+    function removeKeySkill(skillValue) {
+        keySkills = keySkills.filter(s => s !== skillValue);
+        renderKeySkills();
+    }
+    
+    if (addKeySkillBtn) {
+        addKeySkillBtn.addEventListener('click', addKeySkills);
+    }
+    
+    // Добавление по Enter
+    if (keySkillsInput) {
+        keySkillsInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addKeySkills();
+            }
+        });
+    }
+    
+
+    const addRequirementBtn = document.getElementById('addRequirementBtn');
+    const requirementsList = document.getElementById('requirementsList');
+    const template = document.querySelector('.requirements-el.template');
+    
+    if (addRequirementBtn && template) {
+        addRequirementBtn.addEventListener('click', function() {
+            const newRequirement = template.cloneNode(true);
+            newRequirement.style.display = 'grid';
+            newRequirement.classList.remove('template');
+            
+            // Очищаем значения полей
+            const nameInput = newRequirement.querySelector('.requirement-name');
+            const priceInput = newRequirement.querySelector('.requirement-price');
+            if (nameInput) nameInput.value = '';
+            if (priceInput) priceInput.value = '';
+            
+            requirementsList.appendChild(newRequirement);
+        });
+    }
+});
+</script>
+{% endblock %}

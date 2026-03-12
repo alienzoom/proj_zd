@@ -1,0 +1,32 @@
+services:
+  web:
+    build: .
+    container_name: zd_app
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media  # Добавлено
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=zd.settings
+
+  nginx:
+    image: nginx:alpine
+    container_name: zd_nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/static
+      - media_volume:/media  # Добавлено
+    depends_on:
+      - web
+
+volumes:
+  static_volume:
+  media_volume:  
