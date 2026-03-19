@@ -6,6 +6,8 @@ from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.db import transaction
+from django import forms
+from django.db import models
 import json
 import os
 import re
@@ -445,19 +447,37 @@ def project_list(request):
 
 @login_required
 def project_create(request):
-    #Создание нового проекта
+    """
+    Создание нового проекта с множественными требованиями к участникам
+    """
+    import logging
+    logger = logging.getLogger(__name__)
     
-    print(f"=== project_create called ===")
-    print(f"Method: {request.method}")
-    print(f"User: {request.user}")
-    print(f"POST data: {request.POST}")
+    print("\n" + "="*80)
+    print("🚀 СОЗДАНИЕ ПРОЕКТА - НАЧАЛО")
+    print("="*80)
+    print(f"📋 Метод запроса: {request.method}")
+    print(f"👤 Пользователь: {request.user} (ID: {request.user.id})")
+    print(f"📨 POST данные: {dict(request.POST)}")
     
     if request.method == 'POST':
         try:
             with transaction.atomic():
+                print("\n📦 Начало транзакции базы данных")
+                
+                # Создаем проект
+                print("\n📝 Создание проекта:")
+                print(f"  - Название: {request.POST.get('name')}")
+                print(f"  - Описание: {request.POST.get('description')[:50]}...")
+                print(f"  - Ключевые слова: {request.POST.get('keywords')}")
+                print(f"  - Начало: {request.POST.get('start_date')}")
+                print(f"  - Окончание: {request.POST.get('end_date')}")
+                print(f"  - Бюджет: {request.POST.get('budget')}")
+                
                 project = Project.objects.create(
                     name=request.POST.get('name'),
                     description=request.POST.get('description'),
+                    keywords=request.POST.get('keywords', ''),
                     team_activities=request.POST.get('team_activities', ''),
                     work_conditions=request.POST.get('work_conditions', ''),
                     start_date=request.POST.get('start_date') or None,
@@ -467,55 +487,100 @@ def project_create(request):
                     creator=request.user
                 )
                 
-                print(f"✅ Проект создан: {project.name} (ID: {project.id})")
+                print(f"\n✅ ПРОЕКТ СОЗДАН:")
+                print(f"  - ID: {project.id}")
+                print(f"  - Название: {project.name}")
+                print(f"  - В БД: {Project.objects.filter(id=project.id).exists()}")
                 
-                # Обработка требований к участникам
+                # Обработка множественных требований к участникам
                 requirement_names = request.POST.getlist('requirement_name[]')
                 requirement_levels = request.POST.getlist('requirement_level[]')
                 requirement_counts = request.POST.getlist('requirement_count[]')
                 requirement_mandatory = request.POST.getlist('requirement_mandatory[]')
                 requirement_prices = request.POST.getlist('requirement_price[]')
                 requirement_conditions = request.POST.getlist('requirement_condition[]')
+                belbin_roles = request.POST.getlist('belbin_role[]')
                 
-                print(f"Требования: {requirement_names}")
+                print(f"\n📋 Найдено требований: {len(requirement_names)}")
+                print(f"  - Навыки: {requirement_names}")
+                print(f"  - Уровни: {requirement_levels}")
+                print(f"  - Количество: {requirement_counts}")
+                print(f"  - Обязательные: {requirement_mandatory}")
+                print(f"  - Цены: {requirement_prices}")
+                print(f"  - Условия: {requirement_conditions}")
+                print(f"  - Роли Белбина: {belbin_roles}")
                 
+                # Создаем требования для каждого навыка
+                requirements_created = 0
                 for i in range(len(requirement_names)):
                     if requirement_names[i].strip():
+                        # Проверяем, обязательно ли требование
+                        is_mandatory = False
+                        if i < len(requirement_mandatory):
+                            is_mandatory = (requirement_mandatory[i] == 'on' or 
+                                           requirement_mandatory[i] == 'true')
+                        
+                        print(f"\n  📌 Создание требования #{i+1}:")
+                        print(f"     - Навык: {requirement_names[i].strip()}")
+                        print(f"     - Уровень: {requirement_levels[i] if i < len(requirement_levels) else 'не указан'}")
+                        print(f"     - Роль Белбина: {belbin_roles[i] if i < len(belbin_roles) else 'не указана'}")
+                        print(f"     - Количество: {requirement_counts[i] if i < len(requirement_counts) else 1}")
+                        print(f"     - Обязательное: {is_mandatory}")
+                        print(f"     - Цена: {requirement_prices[i] if i < len(requirement_prices) else 'не указана'}")
+                        print(f"     - Условия: {requirement_conditions[i] if i < len(requirement_conditions) else 'не указаны'}")
+                        
+                        # Создаем требование
                         req = ProjectRequirement.objects.create(
                             project=project,
-                            skill_name=requirement_names[i],
-                            level_requirement=requirement_levels[i] if i < len(requirement_levels) else '',
-                            people_count=int(requirement_counts[i]) if i < len(requirement_counts) else 1,
-                            is_mandatory=(requirement_mandatory[i] == 'on') if i < len(requirement_mandatory) else False,
+                            skill_name=requirement_names[i].strip(),
+                            level_requirement=requirement_levels[i] if i < len(requirement_levels) and requirement_levels[i] else '',
+                            belbin_role=belbin_roles[i] if i < len(belbin_roles) and belbin_roles[i] else '',
+                            people_count=int(requirement_counts[i]) if i < len(requirement_counts) and requirement_counts[i] else 1,
+                            is_mandatory=is_mandatory,
                             price=requirement_prices[i] if i < len(requirement_prices) and requirement_prices[i] else None,
-                            work_condition=requirement_conditions[i] if i < len(requirement_conditions) else ''
+                            work_condition=requirement_conditions[i] if i < len(requirement_conditions) and requirement_conditions[i] else ''
                         )
-                        print(f"  - Требование создано: {req.skill_name}")
+                        requirements_created += 1
+                        print(f"     ✅ Требование #{requirements_created} создано (ID: {req.id})")
+                
+                print(f"\n📊 ИТОГИ:")
+                print(f"  - Проект: {project.name} (ID: {project.id})")
+                print(f"  - Требований создано: {requirements_created}")
+                print(f"  - Всего требований в БД для проекта: {project.requirements.count()}")
                 
                 messages.success(request, f'Проект "{project.name}" успешно создан!')
                 
                 # AJAX ответ
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    print(f"\n📡 AJAX ответ отправляется")
                     return JsonResponse({
                         'success': True,
-                        'redirect_url': f'/projects/{project.id}/'
+                        'redirect_url': f'/projects/{project.id}/',
+                        'project_id': project.id,
+                        'requirements_count': requirements_created,
+                        'message': f'Проект "{project.name}" успешно создан'
                     })
                 
-                print(f"Редирект на project:project_detail с ID: {project.id}")
-                # ИСПРАВЛЕНО: добавляем namespace 'project:'
-                return redirect('project:project_detail', project_id=project.id)
+                print(f"\n🔄 Редирект на страницу проекта: /projects/{project.id}/")
+                return redirect('project_detail', project_id=project.id)
                 
         except Exception as e:
-            print(f"❌ Ошибка при создании проекта: {e}")
+            print(f"\n❌ ОШИБКА ПРИ СОЗДАНИИ ПРОЕКТА:")
+            print(f"  - Тип ошибки: {type(e).__name__}")
+            print(f"  - Сообщение: {str(e)}")
             import traceback
-            traceback.print_exc()
+            print(f"  - Traceback: {traceback.format_exc()}")
             
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': False,
-                    'error': str(e)
+                    'error': str(e),
+                    'error_type': type(e).__name__
                 })
             messages.error(request, f'Ошибка при создании проекта: {e}')
+    
+    print("\n📄 GET запрос - отображение формы создания проекта")
+    print("="*80 + "\n")
     
     # GET запрос - показываем форму
     return render(request, 'createProject.html', {
@@ -523,9 +588,10 @@ def project_create(request):
     })
 
 
+# views.py (дополните существующую функцию project_detail для отображения требований)
+
 @login_required
 def project_detail(request, project_id):
-    #Dетальная страница проекта
     project = get_object_or_404(Project, id=project_id)
     
     # Проверка доступа
@@ -539,60 +605,37 @@ def project_detail(request, project_id):
     if not (is_creator or is_participant):
         return HttpResponseForbidden("У вас нет доступа к этому проекту")
     
-    # Требования проекта
-    requirements = project.requirements.all()
+    # Получаем все требования к проекту
+    requirements = project.requirements.all().order_by('-is_mandatory', 'skill_name')
     
-    # Участники
+    # Группировка требований по обязательности
+    mandatory_requirements = requirements.filter(is_mandatory=True)
+    optional_requirements = requirements.filter(is_mandatory=False)
+    
+    # Подсчет общего количества требуемых специалистов
+    total_people_needed = requirements.aggregate(
+        total=models.Sum('people_count')
+    )['total'] or 0
+    
+    # Участники проекта
     participants = project.participants.filter(status='active')
     
     # Приглашения
     invitations = project.invitations.all().order_by('-invited_at')
     
-    # Комментарии
-    comments = project.comments.filter(parent=None).order_by('created_at')
-    
-    # Файлы
-    files = project.files.all().order_by('-uploaded_at')
-    
-    # Доступные кандидаты (из заявок)
-    # Исключаем уже приглашенных и участников
-    invited_app_ids = project.invitations.values_list('application_id', flat=True)
-    participant_app_ids = project.participants.exclude(application=None).values_list('application_id', flat=True)
-    excluded_ids = list(invited_app_ids) + list(participant_app_ids)
-    
-    available_applications = Application.objects.filter(
-        user=request.user  # Только заявки текущего пользователя
-    ).exclude(
-        id__in=excluded_ids
-    ) if is_creator else []
-    
-    # Для создателя - показываем подходящие заявки под требования
-    matching_applications = {}
-    if is_creator:
-        for req in requirements:
-            if req.skill_name:
-                matching = Application.objects.filter(
-                    skill_list__icontains=req.skill_name
-                ).exclude(
-                    id__in=excluded_ids
-                )[:10]  # Ограничим до 10
-                matching_applications[req.id] = matching
-    
     context = {
         'project': project,
         'requirements': requirements,
+        'mandatory_requirements': mandatory_requirements,
+        'optional_requirements': optional_requirements,
+        'total_people_needed': total_people_needed,
         'participants': participants,
         'invitations': invitations,
-        'comments': comments,
-        'files': files,
-        'available_applications': available_applications,
-        'matching_applications': matching_applications,
         'total_requirements_sum': project.get_total_requirements_sum(),
         'is_creator': is_creator,
         'is_participant': is_participant,
     }
     return render(request, 'project_detail.html', context)
-
 
 @login_required
 def project_edit(request, project_id):
@@ -636,7 +679,7 @@ def project_edit(request, project_id):
                         )
                 
                 messages.success(request, 'Проект успешно обновлен!')
-                return redirect('project:project_detail', project_id=project.id)
+                return redirect('project_detail', project_id=project.id)
                 
         except Exception as e:
             messages.error(request, f'Ошибка при обновлении: {e}')
@@ -658,7 +701,7 @@ def project_delete(request, project_id):
         project_name = project.name
         project.delete()
         messages.success(request, f'Проект "{project_name}" удален')
-        return redirect('project:project_list')
+        return redirect('project_list')
     
     return render(request, 'projects/project_confirm_delete.html', {'project': project})
 
@@ -675,7 +718,7 @@ def project_change_status(request, project_id):
             project.save()
             messages.success(request, f'Статус проекта изменен на "{project.get_status_display()}"')
     
-    return redirect('project:project_detail', project_id=project.id)
+    return redirect('project_detail', project_id=project.id)
 
 
 @login_required
@@ -723,7 +766,7 @@ def invite_to_project(request, project_id):
                 return JsonResponse({'success': False, 'error': 'Заявка не найдена'})
             messages.error(request, 'Заявка не найдена')
     
-    return redirect('project:project_detail', project_id=project.id)
+    return redirect('project_detail', project_id=project.id)
 
 
 @login_required
@@ -767,7 +810,7 @@ def cancel_invitation(request, invitation_id):
         invitation.cancel()
         messages.success(request, 'Приглашение отменено')
     
-    return redirect('project:project_detail', project_id=invitation.project.id)
+    return redirect('project_detail', project_id=invitation.project.id)
 
 
 @login_required

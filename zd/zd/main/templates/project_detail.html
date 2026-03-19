@@ -390,9 +390,8 @@
             
             {% if is_creator %}
             <div class="project-actions">
-                <a href="{% url 'project:project_edit' project.id %}" class="btn btn-primary">Редактировать</a>
-                
-                <form method="post" action="{% url 'project:project_change_status' project.id %}" style="display: inline;">
+                <a href="{% url 'project_edit' project.id %}" class="btn btn-primary">Редактировать</a>
+                <form method="post" action="{% url 'project_change_status' project.id %}" style="display: inline;">
                     {% csrf_token %}
                     <select name="status" class="status-select" onchange="this.form.submit()">
                         {% for status_code, status_name in project.STATUS_CHOICES %}
@@ -507,7 +506,7 @@
                     <p>{{ participant.phone }}</p>
                     {% endif %}
                     {% if is_creator %}
-                    <form method="post" action="{% url 'project:remove_participant' project.id participant.id %}" 
+                    <form method="post" action="{% url 'remove_participant' project.id participant.id %}" 
                           style="margin-top: 15px;" onsubmit="return confirm('Удалить участника из проекта?')">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger" style="padding: 6px 12px; font-size: 14px;">Удалить</button>
@@ -531,7 +530,7 @@
         <h3 style="margin: 0 0 15px 0; color: #2c3e50; font-size: 20px;">Удаление проекта</h3>
         <p style="margin: 0 0 20px 0; color: #6c757d; font-size: 16px;">Вы уверены, что хотите удалить проект "{{ project.name }}"?</p>
         <p style="margin: 0 0 25px 0; color: #dc3545; font-size: 14px; font-weight: 500;">Это действие нельзя отменить!</p>
-        <form method="post" action="{% url 'project:project_delete' project.id %}">
+        <form method="post" action="{% url 'project_delete' project.id %}">
             {% csrf_token %}
             <div style="display: flex; gap: 12px; justify-content: flex-end;">
                 <button type="button" onclick="hideDeleteModal()" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #dee2e6; background: white; color: #495057; font-size: 14px; cursor: pointer;">Отмена</button>

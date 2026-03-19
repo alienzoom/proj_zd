@@ -512,15 +512,50 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = [
-            'name', 'description', 'team_activities', 'work_conditions',
-            'start_date', 'end_date', 'budget'
+            'name', 'description', 'keywords', 'team_activities', 
+            'work_conditions', 'start_date', 'end_date', 'budget'
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 5}),
-            'team_activities': forms.Textarea(attrs={'rows': 4}),
-            'work_conditions': forms.Textarea(attrs={'rows': 4}),
-            'start_date': forms.DateInput(attrs={'type': 'date'}),
-            'end_date': forms.DateInput(attrs={'type': 'date'}),
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Например: Разработка мобильного приложения'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 5,
+                'placeholder': 'Опишите идею, цели, задачи и ожидаемые результаты проекта...'
+            }),
+            'keywords': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Python, веб-разработка, искусственный интеллект'
+            }),
+            'team_activities': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Например: разработка backend, создание дизайна, тестирование...'
+            }),
+            'work_conditions': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Формат работы (удаленно/офис), график, требования к участникам...'
+            }),
+            'start_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'end_date': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
+            }),
+            'budget': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Например: 500000',
+                'min': '0',
+                'step': '0.01'
+            }),
+        }
+        help_texts = {
+            'keywords': 'Введите ключевые слова через запятую',
         }
 
 
@@ -528,9 +563,33 @@ class ProjectRequirementForm(forms.ModelForm):
     class Meta:
         model = ProjectRequirement
         fields = [
-            'skill_name', 'level_requirement', 'work_condition',
-            'people_count', 'is_mandatory', 'price'
+            'skill_name', 'level_requirement', 'belbin_role',
+            'people_count', 'is_mandatory', 'price', 'work_condition'
         ]
+        widgets = {
+            'skill_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'например: Python, аналитика, дизайн'
+            }),
+            'level_requirement': forms.Select(attrs={'class': 'form-control'}),
+            'belbin_role': forms.Select(attrs={'class': 'form-control'}),
+            'people_count': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '1',
+                'value': '1'
+            }),
+            'is_mandatory': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'price': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Например: 50000',
+                'min': '0',
+                'step': '0.01'
+            }),
+            'work_condition': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'например: Работа в выходные, командировки'
+            }),
+        }
 
 
 class QuickRequirementForm(forms.Form):

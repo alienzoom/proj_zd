@@ -1,70 +1,76 @@
-<!-- [file name]: createProject.html -->
 {% extends "index.html" %}
 {% load static %}
 
 {% block title %}Создание проекта{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'main/css/project_create.css' %}">
+<link rel="stylesheet" href="{% static 'css/project_create.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="create-project-page">
+<div class="create-project-page" style="background: linear-gradient(135deg, #a7182d 60%, #f3f2f2 40%);">
     <div class="container">
-        <div class="page-header">
+        <div class="page-header" style="background: #ff3d5a;">
             <h1>Создание нового проекта</h1>
             <p>Заполните информацию о проекте, чтобы начать поиск команды</p>
         </div>
 
-        <form method="post" action="{% url 'project:project_create' %}" class="project-form" id="projectForm">
+        <form method="post" class="project-form" id="projectForm">
             {% csrf_token %}
             
             <div class="form-section">
                 <h2>Основная информация</h2>
                 
                 <div class="form-group">
-                    <label for="id_name">Название проекта <span class="required">*</span></label>
+                    <label for="name">Название проекта <span class="required">*</span></label>
                     <input type="text" 
                            name="name" 
-                           id="id_name" 
+                           id="name" 
                            class="form-control" 
                            placeholder="Например: Разработка мобильного приложения"
-                           value="{{ form.name.value|default:'' }}"
                            required>
-                    {% if form.name.errors %}
-                        <div class="field-error">{{ form.name.errors }}</div>
-                    {% endif %}
+                    <span class="field-hint">Придумайте краткое и понятное название</span>
                 </div>
 
                 <div class="form-group">
-                    <label for="id_description">Описание проекта <span class="required">*</span></label>
+                    <label for="description">Описание проекта <span class="required">*</span></label>
                     <textarea name="description" 
-                              id="id_description" 
+                              id="description" 
                               class="form-control" 
                               rows="5"
                               placeholder="Опишите идею, цели, задачи и ожидаемые результаты проекта..."
-                              required>{{ form.description.value|default:'' }}</textarea>
-                    {% if form.description.errors %}
-                        <div class="field-error">{{ form.description.errors }}</div>
-                    {% endif %}
+                              required></textarea>
+                    <span class="field-hint">Чем подробнее описание, тем легче найти подходящих участников</span>
                 </div>
 
                 <div class="form-group">
-                    <label for="id_team_activities">Чем планирует заниматься команда</label>
+                    <label for="{{ form.keywords.id_for_label }}">Ключевые слова (через запятую)</label>
+                    <input 
+                        type="text" 
+                        name="keywords" 
+                        id="keywords" 
+                        class="form-control" 
+                        placeholder="Например: Python, веб-разработка, искусственный интеллект"
+                        required>
+                    <span class="field-hint">Например: менеджмент, веб-разработка, искусственный интеллект</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="team_activities">Чем планирует заниматься команда</label>
                     <textarea name="team_activities" 
-                              id="id_team_activities" 
+                              id="team_activities" 
                               class="form-control" 
                               rows="4"
-                              placeholder="Например: разработка backend, создание дизайна, тестирование...">{{ form.team_activities.value|default:'' }}</textarea>
+                              placeholder="Например: разработка backend, создание дизайна, тестирование..."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="id_work_conditions">Условия работы</label>
+                    <label for="work_conditions">Условия работы</label>
                     <textarea name="work_conditions" 
-                              id="id_work_conditions" 
+                              id="work_conditions" 
                               class="form-control" 
                               rows="4"
-                              placeholder="Формат работы (удаленно/офис), график, требования к участникам...">{{ form.work_conditions.value|default:'' }}</textarea>
+                              placeholder="Формат работы (удаленно/офис), график, требования к участникам..."></textarea>
                 </div>
             </div>
 
@@ -73,34 +79,26 @@
                 
                 <div class="form-row">
                     <div class="form-group half">
-                        <label for="id_start_date">Дата начала</label>
-                        <input type="date" 
-                               name="start_date" 
-                               id="id_start_date" 
-                               class="form-control"
-                               value="{{ form.start_date.value|date:'Y-m-d'|default:'' }}">
+                        <label for="start_date">Дата начала</label>
+                        <input type="date" name="start_date" id="start_date" class="form-control">
                     </div>
 
                     <div class="form-group half">
-                        <label for="id_end_date">Дата окончания</label>
-                        <input type="date" 
-                               name="end_date" 
-                               id="id_end_date" 
-                               class="form-control"
-                               value="{{ form.end_date.value|date:'Y-m-d'|default:'' }}">
+                        <label for="end_date">Дата окончания</label>
+                        <input type="date" name="end_date" id="end_date" class="form-control">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="id_budget">Бюджет проекта (₽)</label>
+                    <label for="budget">Бюджет проекта (₽)</label>
                     <input type="number" 
                            name="budget" 
-                           id="id_budget" 
+                           id="budget" 
                            class="form-control" 
                            placeholder="Например: 500000"
                            min="0"
-                           step="0.01"
-                           value="{{ form.budget.value|default:'' }}">
+                           step="0.01">
+                    <span class="field-hint">Укажите общий бюджет проекта (необязательно)</span>
                 </div>
             </div>
 
@@ -127,7 +125,7 @@
                     <span class="btn-text">Создать проект</span>
                     <span class="btn-loader" style="display: none;">Сохранение...</span>
                 </button>
-                <a href="{% url 'project:project_list' %}" class="btn btn-secondary">Отмена</a>
+                <a href="{% url 'profile' %}" class="btn btn-secondary">Отмена</a>
             </div>
         </form>
     </div>
@@ -150,18 +148,16 @@
                 <label>Навык <span class="required">*</span></label>
                 <input type="text" 
                        name="requirement_name[]" 
-                       class="form-control requirement-name" 
-                       placeholder="например: Python,项目管理, дизайн"
+                       class="form-control" 
+                       placeholder="например: Python, аналитика, дизайн"
                        required>
             </div>
             <div class="form-group half">
                 <label>Уровень</label>
-                <select name="requirement_level[]" class="form-control requirement-level">
+                <select name="requirement_level[]" class="form-control">
                     <option value="">Любой</option>
                     <option value="beginner">Начинающий</option>
-                    <option value="junior">Junior</option>
-                    <option value="middle">Middle</option>
-                    <option value="senior">Senior</option>
+                    <option value="middle">Продвинутый</option>
                     <option value="expert">Эксперт</option>
                 </select>
             </div>
@@ -169,10 +165,29 @@
 
         <div class="form-row">
             <div class="form-group half">
+                <label>Роль по Белбину (необязательно)</label>
+                <select name="belbin_role[]" class="form-control">
+                    <option value="">— Не выбрана —</option>
+                    <option value="implementer">Исполнитель</option>
+                    <option value="coordinator">Координатор</option>
+                    <option value="shaper">Формирователь</option>
+                    <option value="plant">Генератор идей</option>
+                    <option value="resource_investigator">Разведчик</option>
+                    <option value="teamworker">Душа команды</option>
+                    <option value="monitor_evaluator">Аналитик</option>
+                    <option value="completer_finisher">Педантичность</option>
+                    <option value="specialist">Специалист</option>
+                </select>
+            </div>
+            <div class="form-group half"></div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group half">
                 <label>Количество человек</label>
                 <input type="number" 
                        name="requirement_count[]" 
-                       class="form-control requirement-count" 
+                       class="form-control" 
                        value="1" 
                        min="1"
                        step="1">
@@ -182,7 +197,7 @@
                 <div class="checkbox-wrapper">
                     <input type="checkbox" 
                            name="requirement_mandatory[]" 
-                           class="form-checkbox requirement-mandatory" 
+                           class="form-checkbox" 
                            checked>
                     <span class="checkbox-label">Да, требуется обязательно</span>
                 </div>
@@ -193,7 +208,7 @@
             <label>Стоимость (₽)</label>
             <input type="number" 
                    name="requirement_price[]" 
-                   class="form-control requirement-price" 
+                   class="form-control" 
                    placeholder="Например: 50000"
                    min="0"
                    step="0.01">
@@ -203,7 +218,7 @@
             <label>Условие работы</label>
             <input type="text" 
                    name="requirement_condition[]" 
-                   class="form-control requirement-condition" 
+                   class="form-control" 
                    placeholder="например: Работа в выходные, командировки">
         </div>
     </div>
@@ -258,8 +273,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Валидация формы перед отправкой
     form.addEventListener('submit', function(e) {
-        const projectName = document.getElementById('id_name').value.trim();
-        const description = document.getElementById('id_description').value.trim();
+        const projectName = document.getElementById('name').value.trim();
+        const description = document.getElementById('description').value.trim();
         
         if (!projectName) {
             e.preventDefault();
@@ -274,27 +289,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Проверка дат
-        const startDate = document.getElementById('id_start_date').value;
-        const endDate = document.getElementById('id_end_date').value;
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
         
         if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
             e.preventDefault();
             alert('Дата окончания не может быть раньше даты начала');
-            return;
-        }
-        
-        // Проверка требований
-        const requirementNames = document.querySelectorAll('.requirement-name');
-        let hasEmptyRequirement = false;
-        requirementNames.forEach(input => {
-            if (!input.value.trim()) {
-                hasEmptyRequirement = true;
-            }
-        });
-        
-        if (hasEmptyRequirement) {
-            e.preventDefault();
-            alert('Пожалуйста, заполните названия навыков во всех требованиях');
             return;
         }
         
@@ -310,6 +310,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Добавляем одно требование по умолчанию
     addRequirement();
+
+    // Автоматическое заполнение примерами (для демо)
+    const demoData = {
+        name: 'Разработка веб-платформы',
+        description: 'Создание современной веб-платформы для управления проектами с использованием Django и React',
+        team_activities: 'Разработка backend на Django, создание frontend на React, проектирование базы данных, тестирование',
+        work_conditions: 'Удаленная работа, гибкий график, еженедельные созвоны в Zoom',
+    };
+
+    // Раскомментируйте для автозаполнения (для тестирования)
+    /*
+    document.getElementById('name').value = demoData.name;
+    document.getElementById('description').value = demoData.description;
+    document.getElementById('team_activities').value = demoData.team_activities;
+    document.getElementById('work_conditions').value = demoData.work_conditions;
+    */
+});
+
+document.getElementById('projectForm').addEventListener('submit', function(e) {
+    console.log('📤 Форма отправляется...');
+    
+    // Собираем данные формы для отладки
+    const formData = new FormData(this);
+    console.log('📋 Данные формы:');
+    for (let [key, value] of formData.entries()) {
+        console.log(`  - ${key}: ${value}`);
+    }
+    
+    // Проверяем требования
+    const requirements = document.querySelectorAll('.requirement-item');
+    console.log(`📋 Требований в форме: ${requirements.length}`);
+    
+    // Не отменяем отправку, просто логируем
 });
 </script>
 {% endblock %}

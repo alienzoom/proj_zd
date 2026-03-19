@@ -138,6 +138,8 @@ class Project(models.Model):
     
     name = models.CharField('Название проекта', max_length=255)
     description = models.TextField('Описание проекта')
+    keywords = models.CharField('Ключевые слова', max_length=500, blank=True, 
+                               help_text='Введите через запятую')
     team_activities = models.TextField('Чем планирует заниматься команда', blank=True)
     work_conditions = models.TextField('Условия работы', blank=True)
     start_date = models.DateField('Дата начала', null=True, blank=True)
@@ -150,43 +152,41 @@ class Project(models.Model):
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
-        related_name='main_created_projects',  # ИЗМЕНЕНО: добавлен префикс main_
+        related_name='main_created_projects',
         verbose_name='Создатель проекта'
     )
     
     created_at = models.DateTimeField('Дата создания', auto_now_add=True)
     updated_at = models.DateTimeField('Дата обновления', auto_now=True)
     
-    class Meta:
-        verbose_name = 'Проект'
-        verbose_name_plural = 'Проекты'
-        ordering = ['-created_at']
-    
-    def __str__(self):
-        return self.name
+    def get_keywords_list(self):
+        if self.keywords:
+            return [k.strip() for k in self.keywords.split(',') if k.strip()]
+        return []
     
     def get_total_requirements_sum(self):
-        total = 0
-        for participant in self.participants.filter(status='active'):
-            if participant.application and participant.application.requirement_price:
-                try:
-                    prices = str(participant.application.requirement_price).split(',')
-                    total += sum(float(p.strip()) for p in prices if p.strip())
-                except (ValueError, AttributeError):
-                    pass
+        """Сумма всех стоимостей требований к проекту"""
+        from django.db.models import Sum
+        total = self.requirements.aggregate(total=Sum('price'))['total'] or 0
         return total
-    
-    def get_active_participants_count(self):
-        return self.participants.filter(status='active').count()
-
 
 class ProjectRequirement(models.Model):
     SKILL_LEVEL_CHOICES = [
         ('beginner', 'Начинающий'),
-        ('junior', 'Junior'),
-        ('middle', 'Middle'),
-        ('senior', 'Senior'),
+        ('middle', 'Продвинутый'),
         ('expert', 'Эксперт'),
+    ]
+    
+    BELBIN_ROLE_CHOICES = [
+        ('implementer', 'Исполнитель'),
+        ('coordinator', 'Координатор'),
+        ('shaper', 'Формирователь'),
+        ('plant', 'Генератор идей'),
+        ('resource_investigator', 'Разведчик'),
+        ('teamworker', 'Душа команды'),
+        ('monitor_evaluator', 'Аналитик'),
+        ('completer_finisher', 'Педантичность'),
+        ('specialist', 'Специалист'),
     ]
     
     project = models.ForeignKey(
@@ -196,38 +196,20 @@ class ProjectRequirement(models.Model):
         verbose_name='Проект'
     )
     
-    skill_name = models.CharField('Название навыка', max_length=200, blank=True)
+    skill_name = models.CharField('Название навыка', max_length=200)
     level_requirement = models.CharField('Требуемый уровень', max_length=20,
                                         choices=SKILL_LEVEL_CHOICES, blank=True)
-    work_condition = models.CharField('Условие работы', max_length=500, blank=True,
-                                      help_text='Например: "Работа в выходные", "Командировки"')
+    belbin_role = models.CharField('Роль по Белбину', max_length=30,
+                                  choices=BELBIN_ROLE_CHOICES, blank=True)
+    work_condition = models.CharField('Условие работы', max_length=500, blank=True)
     people_count = models.PositiveIntegerField('Количество человек', default=1)
     is_mandatory = models.BooleanField('Обязательное', default=True)
     price = models.DecimalField('Стоимость', max_digits=12, 
-                               decimal_places=2, null=True, blank=True,
-                               help_text='Для ресурсных требований')
+                               decimal_places=2, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        verbose_name = 'Требование к участнику'
-        verbose_name_plural = 'Требования к участникам'
-        ordering = ['-is_mandatory', 'skill_name']
-    
-    def __str__(self):
-        if self.skill_name:
-            return f"{self.skill_name} ({self.level_requirement}) - {self.people_count} чел."
-        return f"Условие: {self.work_condition}"
-    
-    def get_matching_applications(self):
-        if not self.skill_name:
-            return Application.objects.none()
-        
-        return Application.objects.filter(
-            skill_list__icontains=self.skill_name
-        ).exclude(
-            project_memberships__project=self.project
-        ).distinct()
 
+    def __str__(self):
+        return f"{self.skill_name} ({self.get_level_requirement_display()}) - {self.people_count} чел."
 
 class ProjectInvitation(models.Model):
     STATUS_CHOICES = [
