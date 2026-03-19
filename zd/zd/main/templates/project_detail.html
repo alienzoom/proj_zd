@@ -108,6 +108,17 @@
         box-shadow: 0 4px 12px rgba(0,123,255,0.3);
     }
 
+    .btn-success {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+    }
+
     .btn-danger {
         background-color: #dc3545;
         color: white;
@@ -218,11 +229,18 @@
         padding: 20px;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         border: 1px solid #e9ecef;
+        cursor: pointer;
     }
 
     .requirement-item:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        border-color: #007bff;
+    }
+
+    .requirement-item.selected {
+        border: 2px solid #007bff;
+        background-color: #f0f7ff;
     }
 
     .requirement-item h4 {
@@ -375,7 +393,379 @@
             grid-template-columns: 1fr;
         }
     }
+
+    /* Модальное окно */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 16px;
+        max-width: 1000px;
+        width: 95%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .modal-header {
+        background: #007bff;
+        color: white;
+        padding: 20px 25px;
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    .modal-body {
+        padding: 25px;
+    }
+
+    /* Выбор навыка */
+    .skill-selector {
+        margin-bottom: 25px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+    }
+
+    .skill-selector h4 {
+        margin: 0 0 15px 0;
+        color: #2c3e50;
+        font-size: 16px;
+    }
+
+    .skill-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .skill-button {
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 1px solid #dee2e6;
+        background: white;
+        color: #495057;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .skill-button:hover {
+        border-color: #007bff;
+        background: #f0f7ff;
+    }
+
+    .skill-button.selected {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    /* Результаты поиска */
+    .candidates-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .candidate-card {
+        background: #f8f9fa;
+        border-radius: 12px;
+        border: 1px solid #e9ecef;
+        padding: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .candidate-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        border-color: #007bff;
+    }
+
+    .candidate-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .candidate-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .match-score {
+        background: #28a745;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .candidate-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .detail-label {
+        font-size: 12px;
+        color: #6c757d;
+        text-transform: uppercase;
+    }
+
+    .detail-value {
+        font-size: 14px;
+        color: #2c3e50;
+    }
+
+    .candidate-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .skill-tag {
+        background: #e9ecef;
+        color: #495057;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+    }
+
+    .skill-tag.match {
+        background: #28a745;
+        color: white;
+    }
+
+    .invite-button {
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .invite-button:hover {
+        background: #0056b3;
+    }
+
+    .invite-button:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+    }
+
+    .no-candidates {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+    }
+
+    /* Уведомления */
+    .notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .notification {
+        background: white;
+        border-left: 4px solid #007bff;
+        border-radius: 8px;
+        padding: 15px 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        animation: slideIn 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        min-width: 300px;
+    }
+
+    .notification.success {
+        border-left-color: #28a745;
+    }
+
+    .notification.error {
+        border-left-color: #dc3545;
+    }
+
+    .notification.info {
+        border-left-color: #17a2b8;
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-content h4 {
+        margin: 0 0 5px 0;
+        font-size: 16px;
+        color: #2c3e50;
+    }
+
+    .notification-content p {
+        margin: 0;
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .notification-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .notification-btn {
+        padding: 5px 12px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+    }
+
+    .notification-btn.accept {
+        background: #28a745;
+        color: white;
+    }
+
+    .notification-btn.decline {
+        background: #dc3545;
+        color: white;
+    }
+
+    .notification-close {
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
 </style>
+
+<!-- Контейнер для уведомлений -->
+<div id="notificationContainer" class="notification-container"></div>
+
+<!-- Модальное окно для поиска участников -->
+<div id="candidateModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Поиск участников для проекта "{{ project.name }}"</h3>
+            <button type="button" class="modal-close" onclick="closeCandidateModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <!-- Выбор навыка из требований -->
+            <div class="skill-selector">
+                <h4>Выберите навык для поиска:</h4>
+                <div class="skill-buttons" id="skillButtons">
+                    {% for req in requirements %}
+                    <button class="skill-button" data-skill="{{ req.skill_name }}" onclick="selectSkill('{{ req.skill_name }}')">
+                        {{ req.skill_name }}
+                        {% if req.level_requirement %}
+                            ({{ req.get_level_requirement_display }})
+                        {% endif %}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Результаты поиска -->
+            <div id="candidatesList" class="candidates-list">
+                <div class="no-candidates">
+                    <p>Выберите навык для поиска подходящих кандидатов</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="project-detail-page">
     <div class="container">
@@ -401,7 +791,7 @@
                         {% endfor %}
                     </select>
                 </form>
-
+                <button type="button" class="btn btn-success" onclick="openCandidateModal()">Добавить участников</button>
                 <button type="button" class="btn btn-danger" onclick="showDeleteModal()">Удалить</button>
             </div>
             {% endif %}
@@ -465,7 +855,7 @@
             {% if requirements %}
             <div class="requirements-list">
                 {% for req in requirements %}
-                <div class="requirement-item">
+                <div class="requirement-item" data-skill="{{ req.skill_name }}" data-level="{{ req.level_requirement }}">
                     <h4>{{ req.skill_name|default:"Без навыка" }}</h4>
                     <div class="requirement-details">
                         {% if req.level_requirement %}
@@ -541,6 +931,179 @@
 </div>
 
 <script>
+// ==================== УВЕДОМЛЕНИЯ ====================
+let notificationId = 0;
+
+function showNotification(title, message, type = 'info') {
+    const container = document.getElementById('notificationContainer');
+    const id = notificationId++;
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.id = `notification-${id}`;
+    
+    notification.innerHTML = `
+        <div class="notification-content">
+            <h4>${title}</h4>
+            <p>${message}</p>
+        </div>
+        <button class="notification-close" onclick="closeNotification(${id})">×</button>
+    `;
+    
+    container.appendChild(notification);
+    
+    setTimeout(() => closeNotification(id), 5000);
+}
+
+function closeNotification(id) {
+    const notification = document.getElementById(`notification-${id}`);
+    if (notification) {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }
+}
+
+// ==================== МОДАЛЬНОЕ ОКНО ПОИСКА КАНДИДАТОВ ====================
+let selectedSkill = '';
+let allApplications = [];
+
+function openCandidateModal() {
+    document.getElementById('candidateModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    loadAllApplications();
+}
+
+function closeCandidateModal() {
+    document.getElementById('candidateModal').style.display = 'none';
+    document.body.style.overflow = '';
+    selectedSkill = '';
+    document.querySelectorAll('.skill-button').forEach(btn => btn.classList.remove('selected'));
+}
+
+function selectSkill(skill) {
+    selectedSkill = skill;
+    document.querySelectorAll('.skill-button').forEach(btn => {
+        if (btn.dataset.skill === skill) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.remove('selected');
+        }
+    });
+    filterCandidatesBySkill(skill);
+}
+
+function loadAllApplications() {
+    const candidatesList = document.getElementById('candidatesList');
+    candidatesList.innerHTML = '<div class="no-candidates"><p>Загрузка кандидатов...</p></div>';
+    
+    fetch('/api/applications/')
+        .then(response => response.json())
+        .then(data => {
+            allApplications = data;
+            if (selectedSkill) {
+                filterCandidatesBySkill(selectedSkill);
+            } else {
+                candidatesList.innerHTML = '<div class="no-candidates"><p>Выберите навык для поиска кандидатов</p></div>';
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка загрузки кандидатов:', error);
+            candidatesList.innerHTML = '<div class="no-candidates"><p>Ошибка загрузки кандидатов</p></div>';
+        });
+}
+
+function filterCandidatesBySkill(skill) {
+    const candidatesList = document.getElementById('candidatesList');
+    
+    // Фильтруем кандидатов по навыку
+    const candidates = allApplications.filter(app => {
+        if (!app.skill_list) return false;
+        const skills = app.skill_list.toLowerCase().split(',').map(s => s.trim());
+        return skills.includes(skill.toLowerCase());
+    });
+    
+    if (candidates.length === 0) {
+        candidatesList.innerHTML = '<div class="no-candidates"><p>Нет кандидатов с навыком "' + skill + '"</p></div>';
+        return;
+    }
+    
+    // Сортируем по релевантности (количество совпадений навыков)
+    candidates.sort((a, b) => {
+        const aSkills = a.skill_list ? a.skill_list.toLowerCase().split(',').map(s => s.trim()) : [];
+        const bSkills = b.skill_list ? b.skill_list.toLowerCase().split(',').map(s => s.trim()) : [];
+        return bSkills.length - aSkills.length;
+    });
+    
+    candidatesList.innerHTML = candidates.map(app => {
+        const appSkills = app.skill_list ? app.skill_list.split(',').map(s => s.trim()) : [];
+        const skillMatch = appSkills.includes(skill);
+        
+        return `
+            <div class="candidate-card">
+                <div class="candidate-header">
+                    <h4 class="candidate-name">${app.contact_first_name} ${app.contact_last_name}</h4>
+                    <span class="match-score">Совпадение</span>
+                </div>
+                
+                <div class="candidate-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Организация</span>
+                        <span class="detail-value">${app.organization_name || 'Не указана'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Email</span>
+                        <span class="detail-value">${app.contact_email}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Телефон</span>
+                        <span class="detail-value">${app.contact_phone}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Возраст</span>
+                        <span class="detail-value">${app.age || 'Не указан'}</span>
+                    </div>
+                </div>
+                
+                <div class="candidate-skills">
+                    ${appSkills.map(s => `
+                        <span class="skill-tag ${s === skill ? 'match' : ''}">${s}</span>
+                    `).join('')}
+                </div>
+                
+                <button class="invite-button" onclick="inviteCandidate(${app.id})">
+                    Пригласить в проект
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+function inviteCandidate(applicationId) {
+    fetch('/projects/{{ project.id }}/invite/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: `application_id=${applicationId}&message=Приглашаем вас присоединиться к проекту "{{ project.name }}"`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Успех', 'Приглашение успешно отправлено', 'success');
+            // Удаляем кандидата из списка или помечаем как приглашенного
+            filterCandidatesBySkill(selectedSkill);
+        } else {
+            showNotification('Ошибка', data.error || 'Не удалось отправить приглашение', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Ошибка', 'Произошла ошибка при отправке приглашения', 'error');
+    });
+}
+
+// ==================== МОДАЛЬНОЕ ОКНО УДАЛЕНИЯ ====================
 function showDeleteModal() {
     document.getElementById('deleteModal').style.display = 'flex';
 }
@@ -549,12 +1112,25 @@ function hideDeleteModal() {
     document.getElementById('deleteModal').style.display = 'none';
 }
 
-// Закрытие модального окна при клике вне его
+// Закрытие модальных окон при клике вне их
 window.onclick = function(event) {
-    const modal = document.getElementById('deleteModal');
-    if (event.target == modal) {
-        modal.style.display = 'none';
+    const deleteModal = document.getElementById('deleteModal');
+    const candidateModal = document.getElementById('candidateModal');
+    
+    if (event.target == deleteModal) {
+        hideDeleteModal();
+    }
+    if (event.target == candidateModal) {
+        closeCandidateModal();
     }
 }
+
+// Закрытие по нажатию ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        hideDeleteModal();
+        closeCandidateModal();
+    }
+});
 </script>
 {% endblock %}

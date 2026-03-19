@@ -928,3 +928,24 @@ def delete_file(request, project_id, file_id):
         messages.success(request, 'Файл удален')
     
     return redirect('project_detail', project_id=project.id)
+
+@login_required
+def api_applications(request):
+    """API для получения списка всех заявок"""
+    applications = Application.objects.all().order_by('-created_at')
+    data = []
+    for app in applications:
+        data.append({
+            'id': app.id,
+            'contact_first_name': app.contact_first_name,
+            'contact_last_name': app.contact_last_name,
+            'contact_email': app.contact_email,
+            'contact_phone': app.contact_phone,
+            'organization_name': app.organization_name,
+            'age': app.age,
+            'about_me': app.about_me,
+            'team_role': app.get_team_role_display() if app.team_role else None,
+            'skill_list': app.skill_list,
+            'skills_json': app.skills_json,
+        })
+    return JsonResponse(data, safe=False)

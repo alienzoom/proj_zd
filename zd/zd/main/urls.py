@@ -16,6 +16,7 @@ urlpatterns = [
     path('projects/<int:project_id>/edit/', views.project_edit, name='project_edit'),
     path('projects/<int:project_id>/delete/', views.project_delete, name='project_delete'),
     path('projects/<int:project_id>/status/', views.project_change_status, name='project_change_status'),
+    path('api/applications/', views.api_applications, name='api_applications'),
     # Приглашения
     path('projects/<int:project_id>/invite/', views.invite_to_project, name='invite_to_project'),
     path('invitation/<int:invitation_id>/', views.respond_to_invitation, name='respond_to_invitation'),
